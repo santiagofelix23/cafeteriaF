@@ -107,7 +107,7 @@ class PedidoController extends Controller
             $total += $subtotal;
         }
         
-        pedido->update(['total' => $total]);
+        $pedido->update(['total' => $total]);
         
        session()->forget('carrito');
         

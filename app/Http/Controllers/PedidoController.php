@@ -72,34 +72,28 @@ class PedidoController extends Controller
     // GUARDAR PEDIDO EN BASE DE DATOS (FECHA AUTOMÁTICA)
     // ==========================
     public function guardar(Request $request)
-    {
-        // 1. Obtener carrito de sesión
-        $carrito = session('carrito', []);
-        
-        // 2. Validar que haya productos
+    {        $carrito = session('carrito', []);
+    
         if (count($carrito) == 0) {
             return redirect()->route('pedidos.crear')
                             ->with('error', 'El carrito está vacío. Agrega productos primero.');
         }
         
-        // 3. Validar datos del formulario
-        $request->validate([
+       $request->validate([
             'cliente' => 'required|min:2|max:100',
             'origen' => 'nullable|max:50'
         ]);
-        
-        // 4. Crear el pedido en la base de datos (fecha automática)
+            
         $pedido = Pedido::create([
             'cliente' => $request->cliente,
             'origen' => $request->origen,
-            'fecha_hora' => now(), // ← FECHA Y HORA ACTUALES AUTOMÁTICAS
+            'fecha_hora' => now(), 
             'total' => 0
         ]);
         
         $total = 0;
         
-        // 5. Guardar los detalles del pedido
-        foreach ($carrito as $id => $item) {
+                foreach ($carrito as $id => $item) {
             $subtotal = $item['precio'] * $item['cantidad'];
             
             PedidoDetalle::create([
@@ -113,14 +107,11 @@ class PedidoController extends Controller
             $total += $subtotal;
         }
         
-        // 6. Actualizar el total del pedido
-        $pedido->update(['total' => $total]);
+        pedido->update(['total' => $total]);
         
-        // 7. Vaciar el carrito
-        session()->forget('carrito');
+       session()->forget('carrito');
         
-        // 8. Redirigir al recibo
-        return redirect()->route('pedidos.ver', $pedido->id)
+       return redirect()->route('pedidos.ver', $pedido->id)
                          ->with('success', '¡Pedido confirmado exitosamente!');
     }
 
